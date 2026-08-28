@@ -75,7 +75,7 @@ function createMockApp(env, logger) {
   const app = express();
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
-  app.use(express.static(PUBLIC));
+  app.use(express.static(PUBLIC, { index: false }));
 
   app.get('/login', (_req, res) => res.sendFile(path.join(PUBLIC, 'login.html')));
   app.post('/auth/mock', (_req, res) => {
@@ -203,7 +203,7 @@ function createLiveApp(ctx) {
   const app = express();
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
-  app.use(express.static(PUBLIC));
+  app.use(express.static(PUBLIC, { index: false }));
 
   app.get('/login', (_req, res) => res.sendFile(path.join(PUBLIC, 'login.html')));
 

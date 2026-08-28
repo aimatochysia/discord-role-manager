@@ -20,6 +20,7 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); }
 button, input, select { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
 button { cursor: pointer; }
 code { background: var(--elev); padding: 0.1rem 0.35rem; border-radius: 4px; }
 
