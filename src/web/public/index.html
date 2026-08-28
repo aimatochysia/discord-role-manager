@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Role Manager</title>
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body>
+  <div id="app">
+    <aside class="rail">
+      <div class="mark">RM</div>
+      <button class="nav-btn active" data-view="access" title="Access">▣</button>
+      <button class="nav-btn" data-view="ranks" title="Ranks">♟</button>
+      <button class="nav-btn" data-view="settings" title="Settings">⚙</button>
+      <button class="nav-btn" data-view="queue" title="Trainee queue">☑</button>
+      <button class="nav-btn" data-view="audit" title="Audit">📜</button>
+    </aside>
+    <section class="sidebar">
+      <header class="sidebar-head">
+        <div>
+          <div class="eyebrow" id="guildEyebrow">Server</div>
+          <h1 id="guildName">Loading…</h1>
+        </div>
+        <select id="guildSwitch" hidden></select>
+      </header>
+      <p class="hint" id="sidebarHint">Profiles replace Discord’s per-channel overwrite maze. Pick who can see / chat, then apply.</p>
+      <div id="tree" class="tree"></div>
+    </section>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow" id="crumb">Access</div>
+          <h2 id="mainTitle">Select a category or channel</h2>
+        </div>
+        <div class="top-actions">
+          <button class="ghost" id="mapBtn">Download map</button>
+          <button class="primary" id="applyBtn">Apply to Discord</button>
+        </div>
+      </header>
+      <div id="view-access" class="view">
+        <div class="empty" id="emptyState">
+          <h3>Nothing selected</h3>
+          <p>Choose a category on the left. Assign a profile such as Newbie+, Staff, or Booster perks. Channels inherit unless you override them.</p>
+        </div>
+        <section class="inspector" id="inspector" hidden>
+          <div class="card">
+            <div class="row wrap">
+              <label class="field">
+                <span>Access profile</span>
+                <select id="profileSelect"></select>
+              </label>
+              <label class="check" id="inheritWrap" hidden>
+                <input type="checkbox" id="inheritCheck" />
+                Inherit parent category
+              </label>
+            </div>
+            <p class="hint" id="profileHelp"></p>
+          </div>
+          <div class="card">
+            <h3>Who can see / chat</h3>
+            <p class="hint">Owner always bypasses. Developer always sees (cannot moderate players). Unverified is @everyone — keep it off except on the verify gate.</p>
+            <table class="matrix" id="matrix"></table>
+          </div>
+          <div class="row">
+            <button class="primary" id="saveBtn">Save profile</button>
+            <span class="status" id="saveStatus"></span>
+          </div>
+        </section>
+      </div>
+      <div id="view-ranks" class="view" hidden>
+        <section class="card">
+          <h3>Rank bindings</h3>
+          <p class="hint">Each bot rank maps to one Discord role. Unverified defaults to @everyone.</p>
+          <div id="rankList"></div>
+        </section>
+      </div>
+      <div id="view-settings" class="view" hidden>
+        <section class="card">
+          <h3>Verification & boosters</h3>
+          <label class="field">
+            <span>Verify channel id</span>
+            <input id="verifyChannel" placeholder="channel snowflake" />
+          </label>
+          <label class="field">
+            <span>Booster category id</span>
+            <input id="boosterCategory" placeholder="category snowflake" />
+          </label>
+          <label class="check">
+            <input type="checkbox" id="lockdown" />
+            Lock unverified members to the gate channel
+          </label>
+          <label class="check">
+            <input type="checkbox" id="autoBooster" />
+            Auto-grant booster role
+          </label>
+          <button class="primary" id="saveSettings">Save settings</button>
+        </section>
+      </div>
+      <div id="view-queue" class="view" hidden>
+        <section class="card">
+          <h3>Trainee requests</h3>
+          <div id="queueList"></div>
+        </section>
+      </div>
+      <div id="view-audit" class="view" hidden>
+        <section class="card">
+          <h3>Audit log</h3>
+          <div id="auditList"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast" hidden></div>
+  <script src="/app.js"></script>
+</body>
+</html>

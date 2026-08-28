@@ -1,0 +1,11 @@
+node_modules/
+.env
+.env.local
+*.log
+.DS_Store
+coverage/
+tmp/
+output/
+preview-output/
+.idea/
+.vscode/
