@@ -20,9 +20,11 @@ describe('env loader', () => {
     process.env.DASHBOARD_PORT = '4123';
     delete process.env.DISCORD_TOKEN;
     delete process.env.DISCORD_CLIENT_ID;
+    process.env.VERIFY_MESSAGE_ID = '111222333444555666';
     const env = loadEnv();
     assert.equal(env.mock, true);
     assert.equal(env.dashboardPort, 4123);
+    assert.equal(env.verifyMessageId, '111222333444555666');
   });
 
   it('requires token and client id for the live bot', () => {

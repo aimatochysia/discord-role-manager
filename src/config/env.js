@@ -28,6 +28,7 @@ function loadEnv(overrides = {}) {
     databaseUrl: read('DATABASE_URL', 'postgres://rolebot:rolebot@localhost:5432/rolebot'),
     guildId: read('GUILD_ID', ''),
     verifyChannelId: read('VERIFY_CHANNEL_ID', ''),
+    verifyMessageId: read('VERIFY_MESSAGE_ID', ''),
     boosterCategoryId: read('BOOSTER_CATEGORY_ID', ''),
     newbieRoleId: read('NEWBIE_ROLE_ID', ''),
     logChannelId: read('LOG_CHANNEL_ID', ''),

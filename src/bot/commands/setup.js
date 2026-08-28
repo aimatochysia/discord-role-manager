@@ -88,7 +88,7 @@ module.exports = {
         embeds: [
           successEmbed(
             'Verification posted',
-            `New members should only see ${channel}. Reacting with ✅ or using the button grants **${RANKS.newbie.label}**. Apply access afterwards so other channels hide @everyone.`
+            `New members should only see ${channel}. Any reaction on that message (or the button) grants **${RANKS.newbie.label}**. You can also put this message id in \`VERIFY_MESSAGE_ID\` in .env. Apply access afterwards so other channels hide @everyone.`
           )
         ]
       });

@@ -2,7 +2,14 @@
 
 const { Events } = require('discord.js');
 const { routeInteraction } = require('./interactions');
-const { grantNewbie, isVerifyEmoji, handleJoin } = require('../services/verification');
+const {
+  grantNewbie,
+  isWatchedVerifyMessage,
+  resolveVerifyBindings,
+  prefetchVerifyMessage,
+  handleJoin
+} = require('../services/verification');
+const { seedEnvDefaults } = require('../services/setup');
 const { syncBoosterRole, syncGuildBoosters } = require('../services/booster');
 const { deployCommands } = require('./deploy');
 
@@ -19,11 +26,17 @@ function registerEvents(ctx) {
         logger.error({ err: error }, 'Failed to deploy commands');
       }
     }
+    try {
+      await prefetchVerifyMessage(readyClient, env, logger);
+    } catch (error) {
+      logger.warn({ err: error }, 'Could not fetch VERIFY_MESSAGE_ID — check VERIFY_CHANNEL_ID and that the bot can see that channel');
+    }
     for (const guild of readyClient.guilds.cache.values()) {
       try {
+        await seedEnvDefaults(guild, repos, env);
         await syncGuildBoosters(guild, repos);
       } catch (error) {
-        logger.warn({ err: error, guildId: guild.id }, 'Booster sync failed');
+        logger.warn({ err: error, guildId: guild.id }, 'Guild boot sync failed');
       }
     }
   });
@@ -65,13 +78,13 @@ function registerEvents(ctx) {
     try {
       if (reaction.partial) await reaction.fetch();
       if (reaction.message.partial) await reaction.message.fetch();
-      if (!isVerifyEmoji(reaction.emoji)) return;
-      const guild = reaction.message.guild;
+      const message = reaction.message;
+      const guild = message.guild;
       if (!guild) return;
       const settings = await repos.getSettings(guild.id);
-      if (!settings?.verify_message_id || settings.verify_message_id !== reaction.message.id) return;
+      if (!isWatchedVerifyMessage(message.id, env, settings)) return;
       const member = await guild.members.fetch(user.id);
-      const bindings = await repos.getBindings(guild.id);
+      const bindings = await resolveVerifyBindings(guild, repos, env);
       await grantNewbie(member, bindings, 'Verification reaction');
     } catch (error) {
       logger.warn({ err: error }, 'Verify reaction failed');

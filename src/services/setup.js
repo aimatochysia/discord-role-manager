@@ -50,6 +50,7 @@ async function ensureRanks(guild, repos) {
 async function seedEnvDefaults(guild, repos, env) {
   const patch = {};
   if (env.verifyChannelId) patch.verify_channel_id = env.verifyChannelId;
+  if (env.verifyMessageId) patch.verify_message_id = env.verifyMessageId;
   if (env.boosterCategoryId) patch.booster_category_id = env.boosterCategoryId;
   if (env.logChannelId) patch.log_channel_id = env.logChannelId;
   if (Object.keys(patch).length) await repos.upsertSettings(guild.id, patch);

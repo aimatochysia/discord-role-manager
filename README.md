@@ -36,7 +36,7 @@ You pick a profile in `/panel`, `/access`, or the dashboard. **Apply** writes Di
 | **Moderator Trainee** | Purge / slowmode immediately. Timeout, kick, and nick **create a request** that a moderator must approve. |
 | **Booster** | Auto-assigned while someone is boosting. Used for the booster category. |
 | **Member** | Optional graduated community role. |
-| **Newbie** | Granted after ✅ on the verify message (or the verify button). |
+| **Newbie** | Granted by any reaction on `VERIFY_MESSAGE_ID` (or the verify button / `/setup verify` panel). |
 | **Unverified** | Defaults to `@everyone`. New joins only see channels whose profile allows Unverified (the gate). |
 
 ## Commands
@@ -77,7 +77,10 @@ Copy `.env.example` to `.env`.
 **Optional**
 
 - `GUILD_ID` — register slash commands to one guild (instant)
-- `VERIFY_CHANNEL_ID`, `BOOSTER_CATEGORY_ID`, `NEWBIE_ROLE_ID`, `LOG_CHANNEL_ID` — defaults `/setup` can pick up
+- `VERIFY_MESSAGE_ID` — **the Discord message to watch**. Any reaction on it grants the Newbie role. Enable Developer Mode → right-click the message → Copy Message ID.
+- `VERIFY_CHANNEL_ID` — channel that contains that message (so the bot can fetch/cache it on startup)
+- `NEWBIE_ROLE_ID` — role given on react (otherwise bind with `/roles bind`)
+- `BOOSTER_CATEGORY_ID`, `LOG_CHANNEL_ID` — defaults `/setup` can pick up
 - `DASHBOARD_PORT` (default `3000`)
 - `DASHBOARD_PUBLIC_URL` — must be reachable by your browser (used in magic links)
 - `SESSION_SECRET`
@@ -105,7 +108,9 @@ npm run migrate
 npm start
 ```
 
-Then in Discord: `/setup roles` → `/setup verify` → assign profiles in `/panel` or the dashboard → `/access apply`.
+Then in Discord: `/setup roles` (or set `NEWBIE_ROLE_ID`) → put `VERIFY_MESSAGE_ID` in `.env` → assign profiles → `/access apply`.
+
+`/setup verify` is optional if you already have a rules/verify message to react on.
 
 ### Preview the GUI without a bot token
 
@@ -128,7 +133,7 @@ npm test
 You asked for scope questions; these are the defaults so the repo is usable immediately:
 
 1. **Multi-guild** — every table is keyed by `guild_id`.
-2. **Newbie after ✅** — reaction *and* a button on the same verify message. Removing the reaction does not strip the role.
+2. **Newbie from any reaction** on `VERIFY_MESSAGE_ID` (and optionally the `/setup verify` button). Removing the reaction does not strip the role.
 3. **Trainees** may manage chat without approval; member actions need a moderator.
 4. **Developers** cannot moderate players; they can configure access.
 5. **Boosters** get a bound role automatically; the booster category uses the Booster perks profile.

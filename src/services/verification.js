@@ -6,7 +6,7 @@ const { embed, OK } = require('../utils/embeds');
 async function grantNewbie(member, bindings, reason = 'Verification') {
   const newbieId = bindings.newbie;
   if (!newbieId) {
-    throw new Error('Newbie role is not bound. Run /setup roles.');
+    throw new Error('Newbie role is not bound. Set NEWBIE_ROLE_ID in .env or run /setup roles.');
   }
   if (member.roles.cache.has(newbieId)) {
     return { already: true };
@@ -23,13 +23,50 @@ function isVerifyEmoji(emoji) {
   return emoji?.name === '✅' || emoji?.identifier === '✅' || emoji?.name === 'white_check_mark';
 }
 
+function getWatchedVerifyMessageIds(env = {}, settings = null) {
+  const ids = new Set();
+  if (env.verifyMessageId) ids.add(String(env.verifyMessageId));
+  if (settings?.verify_message_id) ids.add(String(settings.verify_message_id));
+  return ids;
+}
+
+function isWatchedVerifyMessage(messageId, env = {}, settings = null) {
+  if (!messageId) return false;
+  return getWatchedVerifyMessageIds(env, settings).has(String(messageId));
+}
+
+async function resolveVerifyBindings(guild, repos, env = {}) {
+  const bindings = await repos.getBindings(guild.id);
+  if (!bindings.newbie && env.newbieRoleId) bindings.newbie = env.newbieRoleId;
+  if (!bindings.unverified) bindings.unverified = guild.id;
+  return bindings;
+}
+
+async function prefetchVerifyMessage(client, env, logger) {
+  if (!env.verifyMessageId) return { skipped: true, reason: 'no_message_id' };
+  if (!env.verifyChannelId) {
+    logger?.info(
+      { messageId: env.verifyMessageId },
+      'VERIFY_MESSAGE_ID is set; set VERIFY_CHANNEL_ID too so the bot can cache the message on boot'
+    );
+    return { skipped: true, reason: 'no_channel_id' };
+  }
+  const channel = await client.channels.fetch(env.verifyChannelId);
+  const message = await channel.messages.fetch(env.verifyMessageId);
+  logger?.info(
+    { channelId: channel.id, messageId: message.id },
+    'Watching verification message — any reaction grants Newbie'
+  );
+  return { skipped: false, message };
+}
+
 function verificationEmbed(guildName) {
   return embed({
     title: `Welcome to ${guildName}`,
     description: [
       'New members can only see this channel until they accept the rules.',
       '',
-      'React with ✅ **or** press the button below to receive **Newbie** and unlock the rest of the server.',
+      'React with any emoji **or** press the button below to receive **Newbie** and unlock the rest of the server.',
       '',
       'By verifying you agree to follow the rules posted here.'
     ].join('\n')
@@ -70,6 +107,10 @@ async function handleJoin(member, repos) {
 module.exports = {
   grantNewbie,
   isVerifyEmoji,
+  getWatchedVerifyMessageIds,
+  isWatchedVerifyMessage,
+  resolveVerifyBindings,
+  prefetchVerifyMessage,
   verificationEmbed,
   verificationComponents,
   postVerificationPanel,
